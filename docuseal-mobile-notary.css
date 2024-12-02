@@ -1,0 +1,65 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box; 
+}
+
+:root{
+    --primary-color: #001183;
+    --accent-color: #ff9b1f;    
+}
+
+@font-face {
+    font-family: Futura;
+    src: url(Fonts/futur.ttf);
+}
+
+#grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+}
+ 
+.hero-section {
+    display: flex;
+    padding: 1rem;
+    height: 100vh;
+    justify-content: center;
+    align-items: center; 
+    border: 1px solid black;
+}
+
+#banner {
+    height: auto;
+    width: auto;
+    align-items: center; 
+    justify-self: center;
+    margin: 10rem;
+}
+
+h1 {
+    font-family: Helvetica, sans-serif;
+    color: var(--accent-color);
+    font-size: 6rem;
+    margin-right: 20px; 
+}
+
+#hero-button {
+    margin-top:575px ;
+    font-family: futura;
+    font-size: 1.5rem;
+    color: var(--accent-color);
+    background-color: var(--primary-color);
+    padding: 1rem;
+    border-radius: 10px;
+
+}
+
+#hero-text {
+    display: flex;
+}
+
+a {
+    text-decoration: none;
+    color:inherit;
+}
