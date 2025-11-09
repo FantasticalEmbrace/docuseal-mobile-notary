@@ -62,9 +62,26 @@ body {
     height: 80px;
 }
 
-.nav-logo .logo {
-    height: 50px;
-    width: auto;
+.logo-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.logo-main {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary-color);
+    line-height: 1;
+}
+
+.logo-sub {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent-color);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: -2px;
 }
 
 .nav-menu {
@@ -456,10 +473,34 @@ body {
     margin-bottom: 40px;
 }
 
-.footer-logo {
-    height: 60px;
-    width: auto;
+.footer-logo-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
     margin-bottom: 20px;
+}
+
+.footer-logo-main {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--primary-color);
+    line-height: 1;
+}
+
+.footer-logo-sub {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--accent-color);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: -2px;
+}
+
+.footer-established {
+    font-size: 12px;
+    color: var(--text-light);
+    margin-top: 5px;
+    font-style: italic;
 }
 
 .footer-section h3 {
@@ -621,4 +662,3 @@ a {
     text-decoration: none;
     color: inherit;
 }
-
