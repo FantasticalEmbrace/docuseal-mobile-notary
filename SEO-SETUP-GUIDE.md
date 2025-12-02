@@ -46,19 +46,12 @@ Before going live, you MUST update these placeholder values in the HTML file:
 
 #### Contact Information (Line ~60-90 in HTML)
 ```json
-"telephone": "+1-XXX-XXX-XXXX",  // Replace with actual phone
-"email": "info@docuseal-mobile-notary.com",  // Replace with actual email
+"telephone": "+1-XXX-XXX-XXXX",  // Replace with actual phone number
+"email": "donald@docusealmobilenotary.net",  // ✅ Already updated!
 ```
 
-#### Business Address (Line ~65-75 in HTML)
-```json
-"address": {
-    "streetAddress": "Mobile Service Area",  // Replace with actual address
-    "addressLocality": "Your City",  // Replace with your city
-    "addressRegion": "Your State",  // Replace with your state
-    "postalCode": "XXXXX",  // Replace with your zip code
-}
-```
+#### Business Address - MOBILE BUSINESS OPTIMIZATION
+✅ **Address removed for mobile business** - This is actually BETTER for mobile notary SEO as it emphasizes the "comes to you" service model without confusing customers with a fixed location.
 
 #### Geographic Coordinates (Line ~75-85 in HTML)
 ```json
@@ -69,7 +62,7 @@ Before going live, you MUST update these placeholder values in the HTML file:
 ```
 
 #### Domain URLs
-Replace all instances of `https://docuseal-mobile-notary.com/` with your actual domain.
+✅ **Already updated to `https://docusealmobilenotary.net/`** - All URLs have been updated throughout the site!
 
 ### Google Analytics Setup
 1. Create a Google Analytics account
