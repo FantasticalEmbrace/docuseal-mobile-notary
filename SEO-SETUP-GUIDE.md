@@ -18,7 +18,7 @@ This guide outlines all the SEO optimizations that have been implemented for you
 - **Local Business Schema**: Helps Google understand your business
 - **Service Catalog**: Lists all your notary services
 - **Contact Information**: Phone, email, and address structured data
-- **Operating Hours**: 7 days a week availability
+- **Operating Hours**: 6 days a week availability
 - **Service Area**: Geographic coverage information
 - **Ratings**: Placeholder for customer reviews
 
