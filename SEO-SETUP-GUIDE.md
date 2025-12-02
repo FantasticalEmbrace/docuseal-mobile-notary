@@ -46,7 +46,7 @@ Before going live, you MUST update these placeholder values in the HTML file:
 
 #### Contact Information (Line ~60-90 in HTML)
 ```json
-"telephone": "+1-XXX-XXX-XXXX",  // Replace with actual phone number
+"telephone": "+1-850-270-3410",  // ✅ Already updated!
 "email": "donald@docusealmobilenotary.net",  // ✅ Already updated!
 ```
 
