@@ -68,6 +68,13 @@ function icalTimestamp(value) {
     return d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
 }
 
+function icalSequence(booking) {
+    const raw = booking.updated_at || booking.created_at;
+    const d = raw ? new Date(raw) : new Date();
+    const ms = d.getTime();
+    return Number.isFinite(ms) ? Math.floor(ms / 1000) : 0;
+}
+
 function bookingToVevent(booking, tz, slotDurationMinutes = 60) {
     const date = String(booking.preferred_date).slice(0, 10);
     const time = String(booking.preferred_time).slice(0, 5);
@@ -104,7 +111,7 @@ function bookingToVevent(booking, tz, slotDurationMinutes = 60) {
         foldLine(`DESCRIPTION:${escapeIcalText(description)}`),
         foldLine(`LOCATION:${escapeIcalText(booking.service_address || '')}`),
         'STATUS:CONFIRMED',
-        'SEQUENCE:0',
+        `SEQUENCE:${icalSequence(booking)}`,
         'TRANSP:OPAQUE',
         'END:VEVENT',
     ];

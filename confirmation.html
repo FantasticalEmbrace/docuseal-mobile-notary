@@ -86,6 +86,7 @@
                     <dt>Date</dt><dd id="conf-date">—</dd>
                     <dt>Time</dt><dd id="conf-time">—</dd>
                     <dt>Notary stamps</dt><dd id="conf-certs">—</dd>
+                    <dt>Notes</dt><dd id="conf-notes">—</dd>
                     <dt>Email</dt><dd id="conf-email">—</dd>
                 </dl>
             </div>
@@ -142,6 +143,9 @@
                         document.getElementById('conf-email').textContent = data.email;
                         if (data.notaryCertCount != null) {
                             document.getElementById('conf-certs').textContent = String(data.notaryCertCount);
+                        }
+                        if (data.notes) {
+                            document.getElementById('conf-notes').textContent = data.notes;
                         }
                         document.getElementById('confirmation-details').hidden = false;
                     })

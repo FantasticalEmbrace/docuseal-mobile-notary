@@ -175,7 +175,8 @@
             const time = formatTimeDisplay(parseBookingTimeHm(booking));
             const req = booking.customer_request_type && booking.customer_request_type !== 'none';
             const label = compact ? `${time} ${name.split(' ')[0]}` : `${time} — ${name}`;
-            return `<button type="button" class="notary-cal-event ${statusClass(booking.status)}${req ? ' notary-ev-request' : ''}" data-booking-id="${booking.id}" title="${escapeHtml(name)} · ${escapeHtml(booking.email || '')}">${escapeHtml(label)}</button>`;
+            const noteHint = booking.notes ? ` · ${booking.notes}` : '';
+            return `<button type="button" class="notary-cal-event ${statusClass(booking.status)}${req ? ' notary-ev-request' : ''}" data-booking-id="${booking.id}" title="${escapeHtml(name)} · ${escapeHtml(booking.email || '')}${escapeHtml(noteHint)}">${escapeHtml(label)}</button>`;
         }
 
         renderShell() {
@@ -337,6 +338,7 @@
                                 <th>Time</th>
                                 <th>Address</th>
                                 <th>Stamps</th>
+                                <th>Notes</th>
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
@@ -353,6 +355,7 @@
                                     <td>${escapeHtml(parseBookingTimeHm(b))}</td>
                                     <td>${escapeHtml(b.service_address || '')}</td>
                                     <td>${escapeHtml(b.notary_cert_count ?? '')}</td>
+                                    <td>${escapeHtml(b.notes || '')}</td>
                                     <td><span class="badge badge-${b.status === 'confirmed' ? 'success' : b.status === 'pending' ? 'warning' : b.status === 'cancelled' ? 'danger' : 'info'}">${escapeHtml(String(b.status || '').toUpperCase())}</span></td>
                                     <td><button type="button" class="btn-sm secondary" data-edit-booking="${b.id}">Edit</button></td>
                                 </tr>`
