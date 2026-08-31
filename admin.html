@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Admin — DocuSeal Mobile Notary</title>
+    <link rel="stylesheet" href="docuseal-mobile-notary.css?v=20260816">
+    <link rel="stylesheet" href="css/admin-calendar.css?v=1">
+    <style>
+        body { background: #f8f9fa; }
+        .admin-wrap { max-width: 720px; margin: 120px auto 4rem; padding: 0 20px; }
+        .admin-wrap.admin-wide { max-width: 1100px; }
+        .admin-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        .admin-card h1 { color: #001183; margin-bottom: 0.5rem; }
+        .admin-card p { color: #666; line-height: 1.6; }
+        .admin-card label {
+            display: block;
+            font-weight: 600;
+            color: #001183;
+            margin-bottom: 0.4rem;
+        }
+        .form-group { margin-bottom: 1rem; }
+        .form-group input[type="email"],
+        .form-group input[type="password"],
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 0.65rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+        .password-wrap { position: relative; }
+        .password-wrap input { padding-right: 6.5rem; }
+        .show-password {
+            position: absolute;
+            right: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            border: 0;
+            background: transparent;
+            color: #001183;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            padding: 0.35rem 0.5rem;
+        }
+        .feed-row {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        .feed-row input {
+            flex: 1;
+            min-width: 16rem;
+            padding: 0.65rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+        .status-box {
+            background: #f0f2ff;
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin: 1rem 0 0;
+            font-size: 0.9rem;
+            color: #444;
+            min-height: 1.25rem;
+        }
+        .status-box.error { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+        .status-box.ok { background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; }
+        .admin-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1rem; }
+        .steps {
+            margin: 1.25rem 0 0;
+            padding-left: 1.25rem;
+            color: #555;
+            line-height: 1.55;
+        }
+        .steps li { margin-bottom: 0.35rem; }
+        .login-links { margin-top: 1rem; font-size: 0.95rem; }
+        .login-links a { color: #001183; font-weight: 600; }
+        .signed-in-as { font-size: 0.9rem; color: #666; margin-bottom: 1rem; }
+        [hidden] { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="admin-wrap" id="admin-wrap">
+        <div class="admin-card" id="login-card">
+            <h1>Admin sign in</h1>
+            <p>Sign in to manage appointments and your Google Calendar subscribe link.</p>
+
+            <form id="login-form" novalidate>
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input id="login-email" type="email" autocomplete="username" required placeholder="donald@docusealmobilenotary.net">
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <div class="password-wrap">
+                        <input id="login-password" type="password" autocomplete="current-password" required>
+                        <button type="button" class="show-password" data-toggle-password="login-password">Show</button>
+                    </div>
+                </div>
+                <button type="submit" class="cta-button primary" id="login-btn">Sign in</button>
+            </form>
+
+            <div class="login-links">
+                <a href="#" id="forgot-password-link">Forgot password / reset password</a>
+            </div>
+            <div class="status-box" id="login-msg" hidden></div>
+        </div>
+
+        <div class="admin-card" id="forgot-card" hidden>
+            <h1>Reset password</h1>
+            <p>Enter your admin email. If it matches, we'll send a reset link (or show one in the server log if email isn't configured yet).</p>
+            <form id="forgot-form" novalidate>
+                <div class="form-group">
+                    <label for="forgot-email">Email</label>
+                    <input id="forgot-email" type="email" autocomplete="username" required>
+                </div>
+                <div class="admin-actions">
+                    <button type="submit" class="cta-button primary">Send reset link</button>
+                    <button type="button" class="cta-button secondary" id="back-to-login">Back to sign in</button>
+                </div>
+            </form>
+            <div class="status-box" id="forgot-msg" hidden></div>
+        </div>
+
+        <div id="admin-dashboard" hidden>
+            <div class="admin-card" style="margin-bottom: 1rem;">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap;">
+                    <div>
+                        <h1 style="margin-bottom:0.25rem;">DocuSeal Admin</h1>
+                        <p class="signed-in-as" id="signed-in-as"></p>
+                    </div>
+                    <div class="admin-actions" style="margin-top:0;">
+                        <button type="button" class="cta-button secondary" id="logout-btn">Sign out</button>
+                        <a href="index.html" class="cta-button secondary">Back to Site</a>
+                    </div>
+                </div>
+                <div class="admin-tabs" role="tablist">
+                    <button type="button" class="admin-tab active" data-admin-tab="calendar">Appointments calendar</button>
+                    <button type="button" class="admin-tab" data-admin-tab="feed">Google Calendar link</button>
+                </div>
+            </div>
+
+            <div class="admin-card admin-wide admin-panel" id="panel-calendar">
+                <h1>Appointments</h1>
+                <div id="calendar-mount"></div>
+            </div>
+
+            <div class="admin-card admin-panel" id="panel-feed" hidden>
+                <h1>Staff calendar link (Google Calendar)</h1>
+                <p>
+                    Same setup as HM Herbs EDSA. Copy this link once, then in Google Calendar choose
+                    <strong>Add calendar → From URL</strong>, paste it, and appointments from the website show up automatically.
+                </p>
+
+                <label for="calendar-feed-url">Subscribe link</label>
+                <div class="feed-row">
+                    <input id="calendar-feed-url" type="text" readonly value="" placeholder="Loading…">
+                    <button type="button" class="cta-button secondary" id="copy-feed-btn">Copy link</button>
+                    <button type="button" class="cta-button primary" id="copy-instructions-btn">Copy instructions</button>
+                    <button type="button" class="cta-button secondary" id="rotate-feed-btn" title="Makes the old link stop working">Make new link</button>
+                </div>
+
+                <div class="status-box" id="feed-msg">Loading calendar link…</div>
+
+                <div class="admin-actions" style="margin-top:0.75rem;">
+                    <button type="button" class="cta-button secondary" id="test-feed-btn">Test feed in browser</button>
+                </div>
+
+                <p class="admin-intro" style="margin-top:1rem;font-size:0.9rem;">
+                    <strong>Google Calendar tips:</strong> After adding the URL, events can take a few hours to appear the first time.
+                    Open <strong>Test feed in browser</strong> — you should see a calendar file download or text starting with <code>BEGIN:VCALENDAR</code>.
+                    If you see “Unauthorized”, sign in again and click <strong>Make new link</strong>, then re-add the calendar in Google.
+                </p>
+
+                <ol class="steps">
+                    <li>Click <strong>Copy link</strong> above</li>
+                    <li>Open <a href="https://calendar.google.com" target="_blank" rel="noopener">calendar.google.com</a></li>
+                    <li>On the left, find <strong>Other calendars</strong> → click <strong>+</strong></li>
+                    <li>Choose <strong>From URL</strong></li>
+                    <li>Paste the link and click <strong>Add calendar</strong></li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/admin-calendar.js?v=1"></script>
+    <script>
+        (function () {
+            const apiOrigin = window.DOCUSEAL_API_ORIGIN || window.location.origin;
+            const TOKEN_KEY = 'docuseal_admin_token';
+
+            const adminWrap = document.getElementById('admin-wrap');
+            const loginCard = document.getElementById('login-card');
+            const forgotCard = document.getElementById('forgot-card');
+            const dashboard = document.getElementById('admin-dashboard');
+            const input = document.getElementById('calendar-feed-url');
+            const msg = document.getElementById('feed-msg');
+            const loginMsg = document.getElementById('login-msg');
+            const forgotMsg = document.getElementById('forgot-msg');
+            let calendarApp = null;
+
+            function getToken() {
+                return localStorage.getItem(TOKEN_KEY) || '';
+            }
+
+            function setToken(token) {
+                if (token) localStorage.setItem(TOKEN_KEY, token);
+                else localStorage.removeItem(TOKEN_KEY);
+            }
+
+            function authHeaders() {
+                return {
+                    'Content-Type': 'application/json',
+                    Authorization: 'Bearer ' + getToken(),
+                };
+            }
+
+            function setBox(el, text, kind) {
+                el.hidden = !text;
+                el.className = 'status-box' + (kind === 'error' ? ' error' : kind === 'ok' ? ' ok' : '');
+                el.textContent = text || '';
+            }
+
+            function showLogin() {
+                loginCard.hidden = false;
+                forgotCard.hidden = true;
+                dashboard.hidden = true;
+                adminWrap.classList.remove('admin-wide');
+            }
+
+            function showForgot() {
+                loginCard.hidden = true;
+                forgotCard.hidden = false;
+                dashboard.hidden = true;
+                adminWrap.classList.remove('admin-wide');
+                document.getElementById('forgot-email').value = document.getElementById('login-email').value || '';
+            }
+
+            async function showDashboard(email) {
+                loginCard.hidden = true;
+                forgotCard.hidden = true;
+                dashboard.hidden = false;
+                adminWrap.classList.add('admin-wide');
+                document.getElementById('signed-in-as').textContent = 'Signed in as ' + (email || '');
+
+                if (!calendarApp && window.DocuSealAdminCalendar) {
+                    calendarApp = new window.DocuSealAdminCalendar();
+                    await calendarApp.mount(document.getElementById('calendar-mount'));
+                }
+
+                await loadFeed();
+            }
+
+            document.querySelectorAll('[data-toggle-password]').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-toggle-password');
+                    const field = document.getElementById(id);
+                    if (!field) return;
+                    const showing = field.type === 'text';
+                    field.type = showing ? 'password' : 'text';
+                    btn.textContent = showing ? 'Show' : 'Hide';
+                });
+            });
+
+            document.querySelectorAll('[data-admin-tab]').forEach((tab) => {
+                tab.addEventListener('click', () => {
+                    const name = tab.getAttribute('data-admin-tab');
+                    document.querySelectorAll('[data-admin-tab]').forEach((t) => {
+                        t.classList.toggle('active', t.getAttribute('data-admin-tab') === name);
+                    });
+                    document.getElementById('panel-calendar').hidden = name !== 'calendar';
+                    document.getElementById('panel-feed').hidden = name !== 'feed';
+                });
+            });
+
+            document.getElementById('forgot-password-link').addEventListener('click', (e) => {
+                e.preventDefault();
+                setBox(forgotMsg, '', '');
+                showForgot();
+            });
+            document.getElementById('back-to-login').addEventListener('click', () => {
+                setBox(loginMsg, '', '');
+                showLogin();
+            });
+
+            document.getElementById('login-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = document.getElementById('login-btn');
+                btn.disabled = true;
+                setBox(loginMsg, 'Signing in…', '');
+                try {
+                    const res = await fetch(`${apiOrigin}/api/admin/auth/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            email: document.getElementById('login-email').value.trim(),
+                            password: document.getElementById('login-password').value,
+                        }),
+                    });
+                    const data = await res.json().catch(() => ({}));
+                    if (!res.ok) {
+                        setBox(loginMsg, data.error || 'Invalid email or password', 'error');
+                        return;
+                    }
+                    setToken(data.token);
+                    await showDashboard(data.email);
+                } catch (_) {
+                    setBox(loginMsg, 'Could not reach booking API. Start the backend server first.', 'error');
+                } finally {
+                    btn.disabled = false;
+                }
+            });
+
+            document.getElementById('forgot-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                setBox(forgotMsg, 'Sending…', '');
+                try {
+                    const res = await fetch(`${apiOrigin}/api/admin/auth/forgot-password`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            email: document.getElementById('forgot-email').value.trim(),
+                        }),
+                    });
+                    const data = await res.json().catch(() => ({}));
+                    setBox(forgotMsg, data.message || 'If an account with that email exists, a password reset link has been sent.', 'ok');
+                } catch (_) {
+                    setBox(forgotMsg, 'Could not reach booking API.', 'error');
+                }
+            });
+
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                setToken('');
+                calendarApp = null;
+                document.getElementById('calendar-mount').innerHTML = '';
+                document.getElementById('login-password').value = '';
+                setBox(loginMsg, '', '');
+                showLogin();
+            });
+
+            function setMsg(text, isError) {
+                msg.className = isError ? 'status-box error' : 'status-box';
+                msg.textContent = text;
+            }
+
+            function instructionsText(url) {
+                return `DocuSeal Mobile Notary calendar link — add to Google Calendar:
+
+1. Open ${apiOrigin}/admin.html and sign in
+2. Click Copy link
+3. In Google Calendar: Other calendars → + → From URL
+4. Paste: ${url}`;
+            }
+
+            async function loadFeed() {
+                try {
+                    const res = await fetch(`${apiOrigin}/api/admin/calendar-feed`, {
+                        headers: authHeaders(),
+                    });
+                    if (res.status === 401) {
+                        setToken('');
+                        showLogin();
+                        setBox(loginMsg, 'Please sign in again.', 'error');
+                        return;
+                    }
+                    if (!res.ok) throw new Error('Could not load calendar link');
+                    const data = await res.json();
+                    input.value = data.feedUrl || '';
+                    setMsg('Copy this link, then paste it in Google Calendar → Add calendar → From URL.');
+                } catch (_) {
+                    setMsg('Could not load calendar link.', true);
+                }
+            }
+
+            document.getElementById('copy-feed-btn').addEventListener('click', async () => {
+                const url = (input.value || '').trim();
+                if (!url) {
+                    setMsg('No calendar link yet.', true);
+                    return;
+                }
+                try {
+                    await navigator.clipboard.writeText(url);
+                    setMsg('Copied. Paste it in Google Calendar → Add calendar → From URL.');
+                } catch (_) {
+                    input.focus();
+                    input.select();
+                    setMsg('Select the link and copy it manually (Ctrl+C).');
+                }
+            });
+
+            document.getElementById('copy-instructions-btn').addEventListener('click', async () => {
+                const url = (input.value || '').trim();
+                if (!url) {
+                    setMsg('No calendar link yet.', true);
+                    return;
+                }
+                try {
+                    await navigator.clipboard.writeText(instructionsText(url));
+                    setMsg('Instructions copied — paste into a text or email.');
+                } catch (_) {
+                    setMsg('Could not copy automatically. Use Copy link instead.', true);
+                }
+            });
+
+            document.getElementById('test-feed-btn').addEventListener('click', () => {
+                const url = (input.value || '').trim();
+                if (!url) {
+                    setMsg('No calendar link yet.', true);
+                    return;
+                }
+                window.open(url, '_blank', 'noopener');
+                setMsg('Opened feed in a new tab. You should see BEGIN:VCALENDAR. If you see Unauthorized, click Make new link.');
+            });
+
+            document.getElementById('rotate-feed-btn').addEventListener('click', async () => {
+                if (!confirm('Make a new calendar link?\n\nThe old link will stop working. Update Google Calendar with the new link.')) {
+                    return;
+                }
+                try {
+                    const res = await fetch(`${apiOrigin}/api/admin/calendar-feed/rotate`, {
+                        method: 'POST',
+                        headers: authHeaders(),
+                    });
+                    if (res.status === 401) {
+                        setToken('');
+                        showLogin();
+                        return;
+                    }
+                    if (!res.ok) throw new Error('Rotate failed');
+                    const data = await res.json();
+                    input.value = data.feedUrl || '';
+                    setMsg('New calendar link created. Update Google Calendar with the new link.');
+                } catch (_) {
+                    setMsg('Could not create a new link.', true);
+                }
+            });
+
+            async function boot() {
+                const token = getToken();
+                if (!token) {
+                    showLogin();
+                    return;
+                }
+                try {
+                    const res = await fetch(`${apiOrigin}/api/admin/auth/me`, { headers: authHeaders() });
+                    if (!res.ok) {
+                        setToken('');
+                        showLogin();
+                        return;
+                    }
+                    const data = await res.json();
+                    await showDashboard(data.email);
+                } catch (_) {
+                    showLogin();
+                    setBox(loginMsg, 'Could not reach booking API. Start the backend server first.', 'error');
+                }
+            }
+
+            boot();
+        })();
+    </script>
+</body>
+</html>

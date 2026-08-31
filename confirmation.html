@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Appointment Confirmed — DocuSeal Mobile Notary</title>
+    <link rel="shortcut icon" href="images/mobile-notary-favicon.png" type="image/x-icon">
+    <link rel="stylesheet" href="docuseal-mobile-notary.css?v=20260816">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <style>
+        .confirmation-wrap {
+            min-height: 70vh;
+            padding: 120px 20px 80px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
+        }
+        .confirmation-card {
+            max-width: 640px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .confirmation-icon {
+            width: 4rem;
+            height: 4rem;
+            margin: 0 auto 1rem;
+            border-radius: 50%;
+            background: #fff3e0;
+            color: #ff9b1f;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+        }
+        .confirmation-card h1 {
+            color: #001183;
+            margin-bottom: 0.5rem;
+        }
+        .confirmation-lead {
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+        .confirmation-details {
+            text-align: left;
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        .confirmation-details dl {
+            display: grid;
+            grid-template-columns: 1fr 1.4fr;
+            gap: 0.5rem 1rem;
+            margin: 0;
+        }
+        .confirmation-details dt { font-weight: 600; color: #001183; }
+        .confirmation-details dd { margin: 0; color: #333; }
+        .confirmation-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="index.html"><img src="images/logo.png" alt="DocuSeal Mobile Notary" class="logo"></a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="confirmation-wrap">
+        <div class="confirmation-card">
+            <div class="confirmation-icon"><i class="fas fa-check"></i></div>
+            <h1>Appointment Confirmed</h1>
+            <p class="confirmation-lead" id="confirmation-lead">Your mobile notary appointment is scheduled. A confirmation will be sent to your email.</p>
+            <div class="confirmation-details" id="confirmation-details" hidden>
+                <dl>
+                    <dt>Name</dt><dd id="conf-name">—</dd>
+                    <dt>Date</dt><dd id="conf-date">—</dd>
+                    <dt>Time</dt><dd id="conf-time">—</dd>
+                    <dt>Notary stamps</dt><dd id="conf-certs">—</dd>
+                    <dt>Email</dt><dd id="conf-email">—</dd>
+                </dl>
+            </div>
+            <div class="confirmation-actions">
+                <a href="index.html" class="cta-button secondary">Back to Home</a>
+                <a href="tel:+1-850-270-3410" class="cta-button primary"><i class="fas fa-phone"></i> Call (850) 270-3410</a>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        (function () {
+            const params = new URLSearchParams(window.location.search);
+            const bookingId = params.get('booking');
+            const email = params.get('email');
+            const date = params.get('date');
+            const time = params.get('time');
+            const firstName = params.get('firstName');
+            const lastName = params.get('lastName');
+
+            function formatTime(t) {
+                if (!t) return '—';
+                const [h, m] = t.split(':');
+                const hour = parseInt(h, 10);
+                const ampm = hour >= 12 ? 'PM' : 'AM';
+                return `${hour % 12 || 12}:${m} ${ampm}`;
+            }
+
+            function formatDate(d) {
+                if (!d) return '—';
+                const [y, mo, day] = d.split('-').map(Number);
+                return new Date(y, mo - 1, day).toLocaleDateString(undefined, {
+                    weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
+                });
+            }
+
+            if (firstName || lastName) {
+                document.getElementById('conf-name').textContent = `${firstName || ''} ${lastName || ''}`.trim();
+                document.getElementById('conf-date').textContent = formatDate(date);
+                document.getElementById('conf-time').textContent = formatTime(time);
+                document.getElementById('conf-email').textContent = email || '—';
+                document.getElementById('confirmation-details').hidden = false;
+            }
+
+            const apiOrigin = window.DOCUSEAL_API_ORIGIN || window.location.origin;
+            if (bookingId && email) {
+                fetch(`${apiOrigin}/api/booking/bookings/${encodeURIComponent(bookingId)}/confirmation-summary?email=${encodeURIComponent(email)}`)
+                    .then((r) => r.ok ? r.json() : null)
+                    .then((data) => {
+                        if (!data) return;
+                        document.getElementById('conf-name').textContent = `${data.firstName} ${data.lastName}`;
+                        document.getElementById('conf-date').textContent = formatDate(data.preferredDate);
+                        document.getElementById('conf-time').textContent = formatTime(data.preferredTime);
+                        document.getElementById('conf-email').textContent = data.email;
+                        if (data.notaryCertCount != null) {
+                            document.getElementById('conf-certs').textContent = String(data.notaryCertCount);
+                        }
+                        document.getElementById('confirmation-details').hidden = false;
+                    })
+                    .catch(() => {});
+            }
+        })();
+    </script>
+</body>
+</html>

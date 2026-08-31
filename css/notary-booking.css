@@ -1,0 +1,376 @@
+/* DocuSeal Mobile Notary — booking modal (styled like hmherbs EDSA calendar) */
+
+html.notary-modal-open,
+body.notary-modal-open {
+    overflow: hidden !important;
+}
+
+.notary-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 10050;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.notary-modal.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.notary-modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 17, 131, 0.55);
+    backdrop-filter: blur(4px);
+}
+
+.notary-modal-content {
+    position: relative;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+    max-width: 560px;
+    width: 92%;
+    max-height: 90vh;
+    overflow-y: auto;
+    z-index: 1;
+    transform: scale(0.96);
+    transition: transform 0.25s ease;
+}
+
+.notary-modal.show .notary-modal-content {
+    transform: scale(1);
+}
+
+.notary-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #e8eaf6;
+    background: linear-gradient(135deg, #001183 0%, #0a2a9a 100%);
+    border-radius: 16px 16px 0 0;
+}
+
+.notary-modal-header h2 {
+    margin: 0;
+    color: #fff;
+    font-size: 1.35rem;
+    font-weight: 700;
+}
+
+.notary-modal-close {
+    width: 2.5rem;
+    height: 2.5rem;
+    border: none;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.notary-modal-close:hover {
+    background: rgba(255, 155, 31, 0.9);
+}
+
+.notary-modal-body {
+    padding: 1.5rem;
+}
+
+.notary-form-message {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+}
+
+.notary-form-message-error {
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+.notary-form-message-warning {
+    background: #fffbeb;
+    color: #92400e;
+    border: 1px solid #fde68a;
+}
+
+.notary-form-message-success {
+    background: #ecfdf5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+
+.notary-step-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+}
+
+.notary-step-dot {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    background: #e8eaf6;
+    color: #001183;
+}
+
+.notary-step-dot.active {
+    background: #ff9b1f;
+    color: #fff;
+}
+
+.notary-step-line {
+    width: 3rem;
+    height: 2px;
+    background: #e8eaf6;
+}
+
+.notary-calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.notary-calendar-header h3 {
+    margin: 0;
+    font-size: 1.15rem;
+    color: #001183;
+}
+
+.notary-calendar-nav {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 8px;
+    background: #f0f2ff;
+    color: #001183;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: all 0.2s ease;
+}
+
+.notary-calendar-nav:hover {
+    background: #ff9b1f;
+    color: #fff;
+}
+
+.notary-calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.35rem;
+    margin-bottom: 1rem;
+}
+
+.calendar-day-header {
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.75rem;
+    color: #666;
+    padding: 0.25rem;
+}
+
+.calendar-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    background: #fff;
+    transition: all 0.15s ease;
+}
+
+.calendar-day:hover:not(.disabled):not(.selected) {
+    border-color: #001183;
+    background: #f0f2ff;
+}
+
+.calendar-day.today:not(.selected) {
+    border: 2px solid #001183;
+    font-weight: 700;
+    color: #001183;
+}
+
+.calendar-day.selected {
+    background: #001183;
+    color: #fff;
+    border-color: #001183;
+}
+
+.calendar-day.disabled,
+.calendar-day.empty {
+    opacity: 0.35;
+    cursor: not-allowed;
+    background: #f9fafb;
+}
+
+.notary-time-slots h4 {
+    margin: 0 0 0.75rem;
+    color: #001183;
+    font-size: 1rem;
+}
+
+.time-slots-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 0.5rem;
+}
+
+.time-slot-btn {
+    padding: 0.65rem 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: #fff;
+    color: #001183;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.time-slot-btn:hover:not(:disabled) {
+    border-color: #ff9b1f;
+    background: #fff8ef;
+}
+
+.time-slot-btn.selected {
+    background: #ff9b1f;
+    border-color: #ff9b1f;
+    color: #fff;
+}
+
+.time-slot-btn:disabled,
+.time-slot-btn.unavailable {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.no-date-selected,
+.no-slots {
+    color: #666;
+    font-size: 0.95rem;
+    text-align: center;
+    padding: 1rem;
+}
+
+.notary-selected-summary {
+    background: #f0f2ff;
+    border-left: 4px solid #ff9b1f;
+    padding: 0.75rem 1rem;
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 1rem;
+    color: #001183;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.35rem;
+    font-weight: 600;
+    color: #001183;
+    font-size: 0.9rem;
+}
+
+.notary-field-hint {
+    margin: 0 0 0.5rem;
+    font-size: 0.82rem;
+    line-height: 1.4;
+    color: #5b6475;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #001183;
+    box-shadow: 0 0 0 3px rgba(0, 17, 131, 0.12);
+}
+
+.notary-step-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+}
+
+.notary-btn {
+    padding: 0.75rem 1.25rem;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.notary-btn-primary {
+    background: #ff9b1f;
+    color: #fff;
+    border-color: #ff9b1f;
+}
+
+.notary-btn-primary:hover:not(:disabled) {
+    background: #e8890b;
+    border-color: #e8890b;
+}
+
+.notary-btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.notary-btn-secondary {
+    background: #fff;
+    color: #001183;
+    border-color: #001183;
+}
+
+.notary-btn-secondary:hover {
+    background: #f0f2ff;
+}
+
+@media (max-width: 480px) {
+    .notary-modal-body {
+        padding: 1rem;
+    }
+
+    .notary-step-actions {
+        flex-direction: column-reverse;
+    }
+
+    .notary-btn {
+        width: 100%;
+        text-align: center;
+    }
+}
