@@ -180,9 +180,14 @@
 
         renderShell() {
             const title = periodTitle(this._cursor, this._view);
+            const errorBanner = this._loadError
+                ? `<div class="status-box error" style="margin-bottom:1rem;">${escapeHtml(this._loadError)}</div>`
+                : '';
             return `
+                ${errorBanner}
                 <p class="admin-intro">
                     Calendar view — click an appointment to edit. Use <strong>Block dates</strong> to close days to online booking.
+                    Bookings only appear here when the site uses the booking modal (not Calendly) and the backend API is running.
                 </p>
                 <div class="notary-cal" id="notary-cal-root">
                     <div class="notary-cal-toolbar">
@@ -607,6 +612,7 @@
 
         async refresh() {
             const range = this.getRange();
+            this._loadError = '';
             try {
                 const [bookingsRes, blockedRes] = await Promise.all([
                     this.apiRequest(
@@ -623,6 +629,21 @@
                 this._blockedDatesList = blocked;
             } catch (e) {
                 console.warn('Calendar refresh:', e);
+                this._bookings = [];
+                this._bookingsById = new Map();
+                this._loadError =
+                    'Could not load bookings from the API. Start the backend (cd backend && npm start) and open admin through http://localhost:3020/admin.html — not as a file on your desktop.';
+                if (String(e.message || '').includes('Not found') || String(e.message || '').includes('404')) {
+                    this._loadError +=
+                        ' The server may be missing /api/admin/bookings — upload and run the backend folder from this repo.';
+                }
+            }
+            const mount = document.getElementById('calendar-mount');
+            if (mount && this._loadError) {
+                const existing = mount.querySelector('.status-box.error');
+                if (!existing) {
+                    mount.insertAdjacentHTML('afterbegin', `<div class="status-box error" style="margin-bottom:1rem;">${escapeHtml(this._loadError)}</div>`);
+                }
             }
             this.renderBody();
             this.renderBlockedPanel();
