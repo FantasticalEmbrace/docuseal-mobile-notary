@@ -1,4 +1,5 @@
-# SEO and Performance Optimizations for DocuSeal Mobile Notary
+# DocuSeal Mobile Notary — hosting rules
+# IMPORTANT: Do not remove the /api/ rules below or the booking calendar will break.
 
 # Enable compression
 <IfModule mod_deflate.c>
@@ -11,6 +12,7 @@
     AddOutputFilterByType DEFLATE application/rss+xml
     AddOutputFilterByType DEFLATE application/javascript
     AddOutputFilterByType DEFLATE application/x-javascript
+    AddOutputFilterByType DEFLATE application/json
 </IfModule>
 
 # Set cache headers for better performance
@@ -27,22 +29,21 @@
     ExpiresByType text/html "access plus 1 day"
 </IfModule>
 
-# Force HTTPS redirect (uncomment when SSL is configured)
-# RewriteEngine On
-# RewriteCond %{HTTPS} off
-# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# Booking API must pass through untouched (fixes ERR_TOO_MANY_REDIRECTS and 403)
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
 
-# Remove trailing slashes for SEO (never touch /api/* — breaks booking API)
-RewriteEngine On
-RewriteRule ^api/ - [L]
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_URI} !^/api/
-RewriteCond %{REQUEST_URI} (.+)/$
-RewriteRule ^ %1 [R=301,L]
+    # Never rewrite /api/* — required for booking calendar + admin
+    RewriteCond %{REQUEST_URI} ^/api/ [NC]
+    RewriteRule .* - [L]
 
-# Custom error pages
-ErrorDocument 404 /404.html
-ErrorDocument 500 /500.html
+    # Remove trailing slashes on normal pages only (not API)
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} !^/api/ [NC]
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [R=301,L]
+</IfModule>
 
 # Security headers
 <IfModule mod_headers.c>
