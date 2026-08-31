@@ -187,7 +187,8 @@ function createAdminRouter(db) {
             await db.execute(
                 `UPDATE notary_bookings
                  SET status = ?, preferred_date = ?, preferred_time = ?, admin_notes = ?,
-                     customer_request_type = 'none', customer_request_notes = NULL
+                     customer_request_type = 'none', customer_request_notes = NULL,
+                     updated_at = CURRENT_TIMESTAMP
                  WHERE id = ?`,
                 [status, nextDate, `${nextTime}:00`, admin_notes, bookingId]
             );
