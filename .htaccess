@@ -1,49 +1,41 @@
-# DocuSeal Mobile Notary — hosting rules
-# IMPORTANT: Do not remove the /api/ rules below or the booking calendar will break.
+# DocuSeal Mobile Notary
 
-# Enable compression
-<IfModule mod_deflate.c>
-    AddOutputFilterByType DEFLATE text/plain
-    AddOutputFilterByType DEFLATE text/html
-    AddOutputFilterByType DEFLATE text/xml
-    AddOutputFilterByType DEFLATE text/css
-    AddOutputFilterByType DEFLATE application/xml
-    AddOutputFilterByType DEFLATE application/xhtml+xml
-    AddOutputFilterByType DEFLATE application/rss+xml
-    AddOutputFilterByType DEFLATE application/javascript
-    AddOutputFilterByType DEFLATE application/x-javascript
-    AddOutputFilterByType DEFLATE application/json
+# --- DO NOT cache HTML (this was causing / to serve an old homepage) ---
+<IfModule mod_headers.c>
+    <FilesMatch "\.(html?|HTML?)$">
+        Header set Cache-Control "no-cache, no-store, must-revalidate, max-age=0"
+        Header set Pragma "no-cache"
+        Header set Expires "0"
+    </FilesMatch>
 </IfModule>
 
-# Set cache headers for better performance
+# Compression
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/plain text/html text/css application/javascript application/json
+</IfModule>
+
+# Cache static assets only (NOT html)
 <IfModule mod_expires.c>
     ExpiresActive on
     ExpiresByType text/css "access plus 1 year"
     ExpiresByType application/javascript "access plus 1 year"
     ExpiresByType image/png "access plus 1 year"
-    ExpiresByType image/jpg "access plus 1 year"
     ExpiresByType image/jpeg "access plus 1 year"
     ExpiresByType image/gif "access plus 1 year"
-    ExpiresByType image/ico "access plus 1 year"
-    ExpiresByType image/icon "access plus 1 year"
-    ExpiresByType text/html "access plus 1 day"
+    ExpiresByType image/webp "access plus 1 year"
 </IfModule>
 
-# Booking API must pass through untouched (fixes ERR_TOO_MANY_REDIRECTS and 403)
+# Routing — never break /api/*
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteBase /
 
-    # Never rewrite /api/* — required for booking calendar + admin
-    RewriteCond %{REQUEST_URI} ^/api/ [NC]
-    RewriteRule .* - [L]
+    RewriteRule ^api/ - [L]
 
-    # Remove trailing slashes on normal pages only (not API)
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteCond %{REQUEST_URI} !^/api/ [NC]
-    RewriteCond %{REQUEST_URI} (.+)/$
-    RewriteRule ^ %1 [R=301,L]
+    RewriteRule ^$ index.html [L]
 </IfModule>
+
+DirectoryIndex index.html
 
 # Security headers
 <IfModule mod_headers.c>
@@ -53,13 +45,7 @@
     Header always set Referrer-Policy "strict-origin-when-cross-origin"
 </IfModule>
 
-# Prevent access to sensitive files
 <Files "*.log">
-    Order allow,deny
-    Deny from all
-</Files>
-
-<Files ".htaccess">
     Order allow,deny
     Deny from all
 </Files>
