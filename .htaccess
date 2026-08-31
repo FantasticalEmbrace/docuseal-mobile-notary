@@ -32,11 +32,13 @@
 # RewriteCond %{HTTPS} off
 # RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-# Remove trailing slashes for SEO
+# Remove trailing slashes for SEO (never touch /api/* — breaks booking API)
 RewriteEngine On
+RewriteRule ^api/ - [L]
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{THE_REQUEST} /+([^?\s]*?)/?(\?[^\s]*)?(\s|\?|$)
-RewriteRule ^ /%1%2 [R=301,L]
+RewriteCond %{REQUEST_URI} !^/api/
+RewriteCond %{REQUEST_URI} (.+)/$
+RewriteRule ^ %1 [R=301,L]
 
 # Custom error pages
 ErrorDocument 404 /404.html
